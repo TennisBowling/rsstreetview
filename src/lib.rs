@@ -80,6 +80,33 @@ impl StreetView {
         }
     }
 
+    /// Creates a new StreetView client with a custom reqwest Client.
+    ///
+    /// This allows you to configure the HTTP client with custom settings
+    /// such as proxies, timeouts, or custom headers.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use rsstreetview::StreetView;
+    /// # use reqwest::Client;
+    /// # use std::time::Duration;
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let custom_client = Client::builder()
+    ///     .timeout(Duration::from_secs(60))
+    ///     .build()?;
+    /// let client = StreetView::with_client(custom_client);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_client(client: Client) -> Self {
+        Self {
+            client,
+            api_key: None,
+        }
+    }
+
     /// Search for panoramas at a given GPS coordinate.
     ///
     /// Returns a list of panoramas ordered by relevance, including historical
