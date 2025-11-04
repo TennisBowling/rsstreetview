@@ -154,7 +154,12 @@ pub trait PanoramaSaveExt {
 
     /// Encode image as WebP and return bytes.
     ///
-    /// Returns the encoded image as `Vec<u8>` with quality=85.
+    /// Returns the encoded image as `Vec<u8>` with specified effort and quality.
+    ///
+    /// # Arguments
+    ///
+    /// * `effort` - Compression effort (0-6, higher = slower but better compression)
+    /// * `quality` - WebP quality (1-100, higher = better quality but larger file)
     ///
     /// # Example
     ///
@@ -165,12 +170,12 @@ pub trait PanoramaSaveExt {
     /// # let client = StreetView::new();
     /// # let panos = client.search_panoramas(41.8982208, 12.4764804).await?;
     /// let image = client.download_panorama(&panos[0].pano_id, 3).await?;
-    /// let bytes = image.to_webp_bytes()?;
+    /// let bytes = image.to_webp_bytes(4, 85)?;
     /// // Send bytes over HTTP, store in database, etc.
     /// # Ok(())
     /// # }
     /// ```
-    fn to_webp_bytes(&self) -> Result<Vec<u8>>;
+    fn to_webp_bytes(&self, effort: u8, quality: u8) -> Result<Vec<u8>>;
 
     /// Encode image as JPEG and return bytes.
     ///
@@ -234,11 +239,11 @@ impl PanoramaSaveExt for DynamicImage {
         save_panorama(self, path, &options)
     }
 
-    fn to_webp_bytes(&self) -> Result<Vec<u8>> {
+    fn to_webp_bytes(&self, effort: u8, quality: u8) -> Result<Vec<u8>> {
         let options = SaveOptions::new()
             .format(ImageFormat::WebP)
-            .webp_quality(85)
-            .webp_method(4);
+            .webp_quality(quality)
+            .webp_method(effort);
         encode_panorama(self, &options)
     }
 
